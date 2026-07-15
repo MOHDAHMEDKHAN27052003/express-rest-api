@@ -1,5 +1,5 @@
-const { default: bcrypt } = require("bcryptjs");
 const { default: mongoose } = require("mongoose");
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
     name: { type: String },
@@ -8,6 +8,16 @@ const userSchema = new mongoose.Schema({
 },
     { timestamps: true }
 );
+
+userSchema.pre('save', async function () {
+    const salt = await bcrypt.genSalt();
+
+    this.password = await bcrypt.hash(this.password, salt);
+});
+
+userSchema.methods.comparePassword = async function (plainPassword) {
+    return await bcrypt.compare(plainPassword, this.password);
+};
 
 userSchema.set('toJSON', {
     transform: function (doc, ret) {
