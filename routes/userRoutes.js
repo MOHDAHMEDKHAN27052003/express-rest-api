@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const { signupUser, userProfile } = require('../controllers/userController');
+const { putProfile, getProfile } = require('../controllers/userController');
 const { validateUser, handleValidationErrors } = require("../middleware/validation");
+const signup = require("../controllers/authController");
 
-router.post('/signup', validateUser, handleValidationErrors, signupUser);
+router.post('/signup', validateUser, handleValidationErrors, signup);
 
-router.get('/:id', userProfile);
+router.get('/:id', getProfile);
+
+router.put('/:id', validateUser, handleValidationErrors, putProfile);
 
 module.exports = router;
