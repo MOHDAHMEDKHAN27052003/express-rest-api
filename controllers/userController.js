@@ -1,6 +1,7 @@
 const User = require("../models/User");
+const errorResponse = require("../utils/errorHandler");
 
-const getProfile = async (req, res) => {
+const getUser = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findById(id);
@@ -20,12 +21,8 @@ const getProfile = async (req, res) => {
     } catch (error) {
         console.error("Error fetching user!", error.message);
 
-        res.status(500).json({
-            success: false,
-            message: "Internal server error",
-            error: error.message
-        });
+        errorResponse(res, error, 500);
     }
 }
 
-module.exports = { getProfile };
+module.exports = { getUser };

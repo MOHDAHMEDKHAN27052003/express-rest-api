@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const errorResponse = require("../utils/errorHandler");
 
 const signup = async (req, res) => {
     try {
@@ -30,11 +31,7 @@ const signup = async (req, res) => {
     } catch (error) {
         console.error("Error signing up!", error.message);
 
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error',
-            error: error.message
-        });
+        errorResponse(res, error, 500);
     }
 }
 
