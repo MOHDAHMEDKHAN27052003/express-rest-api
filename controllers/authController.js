@@ -29,8 +29,6 @@ const signup = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error signing up!", error.message);
-
         errorResponse(res, error, 500);
     }
 }
