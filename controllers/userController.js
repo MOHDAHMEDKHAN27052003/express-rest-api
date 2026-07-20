@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const errorResponse = require("../utils/errorHandler");
 
 const getUser = async (req, res) => {
     try {
@@ -20,8 +19,6 @@ const getUser = async (req, res) => {
 
     } catch (error) {
         console.error("Error fetching user!", error.message);
-
-        errorResponse(res, error, 500);
     }
 }
 

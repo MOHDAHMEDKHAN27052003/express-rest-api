@@ -1,5 +1,4 @@
 const User = require("../models/User");
-const errorResponse = require("../utils/errorHandler");
 
 const signup = async (req, res) => {
     try {
@@ -30,8 +29,6 @@ const signup = async (req, res) => {
 
     } catch (error) {
         console.error("Error signing up!", error.message);
-
-        errorResponse(res, error, 500);
     }
 }
 
