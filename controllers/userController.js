@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const errorResponse = require("../utils/errorHandler");
+const errorResponse = require("../utils/errorResponse");
 
 const getUser = async (req, res) => {
     try {
