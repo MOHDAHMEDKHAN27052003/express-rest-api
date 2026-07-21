@@ -44,7 +44,7 @@ const updateUser = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({
-                success: 'false',
+                success: false,
                 message: 'User not found!'
             })
         }
@@ -61,8 +61,8 @@ const updateUser = async (req, res) => {
             data: user
         })
     } catch (error) {
-        if (error.code = 11000) {
-            res.status(400).json({
+        if (error.code === 11000) {
+            return res.status(400).json({
                 success: false,
                 message: "This email already exist!"
             })
@@ -72,4 +72,27 @@ const updateUser = async (req, res) => {
     }
 }
 
-module.exports = { getUser, updateUser };
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findById(id);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found!'
+            })
+        }
+
+        await User.findByIdAndDelete(id);
+
+        res.status(200).json({
+            success: true,
+            message: 'Account deleted successfully!'
+        })
+    } catch (error) {
+        errorResponse(res, error, 500);
+    }
+}
+
+module.exports = { getUser, updateUser, deleteUser };
