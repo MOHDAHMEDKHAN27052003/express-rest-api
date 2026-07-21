@@ -9,7 +9,7 @@ const getUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'User not found'
+                message: 'User not found!'
             });
         }
 
@@ -36,7 +36,7 @@ const updateUser = async (req, res) => {
         if (!isValidOperation) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid update fields'
+                message: 'Invalid update fields!'
             })
         }
 
@@ -57,14 +57,14 @@ const updateUser = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: "User updated successfully!",
+            message: "Profile updated successfully!",
             data: user
         })
     } catch (error) {
         if (error.code = 11000) {
             res.status(400).json({
                 success: false,
-                message: "Email already exists!"
+                message: "This email already exist!"
             })
         }
 
