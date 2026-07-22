@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
     name: { type: String },
     email: { type: String },
     password: { type: String },
+    refreshToken: {type: String}
 },
     { timestamps: true }
 );
@@ -23,6 +24,7 @@ userSchema.set('toJSON', {
     transform: function (doc, ret) {
         delete ret.password;
         delete ret.__v;
+        delete ret.refreshToken;
 
         return ret;
     }
