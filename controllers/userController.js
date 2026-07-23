@@ -3,21 +3,10 @@ const errorResponse = require("../utils/serverErrorResponse");
 
 const getUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = await User.findById(id);
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found!'
-            });
-        }
-
         res.status(200).json({
             success: true,
-            data: user
+            data: req.user
         });
-
     } catch (error) {
         errorResponse(res, error, 500);
     }
@@ -25,9 +14,7 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const { id } = req.params;
         const updates = req.body;
-
         const allowedUpdates = ['name', 'email', 'password'];
         const isValidOperation = Object.keys(updates).every(field =>
             allowedUpdates.includes(field)
@@ -37,21 +24,14 @@ const updateUser = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'Invalid update fields!'
-            })
+            });
         }
 
-        const user = await User.findById(id);
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found!'
-            })
-        }
+        const user = req.user;
 
         Object.keys(updates).forEach(key => {
-            user[key] = updates[key]
-        })
+            user[key] = updates[key];
+        });
 
         await user.save();
 
@@ -59,37 +39,28 @@ const updateUser = async (req, res) => {
             success: true,
             message: "Profile updated successfully!",
             data: user
-        })
+        });
     } catch (error) {
         if (error.code === 11000) {
             return res.status(400).json({
                 success: false,
-                message: "This email already exist!"
-            })
+                message: "This email already exists!"
+            });
         }
-
         errorResponse(res, error, 500);
     }
 }
 
 const deleteUser = async (req, res) => {
     try {
-        const { id } = req.params;
-        const user = await User.findById(id);
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'User not found!'
-            })
-        }
-
-        await User.findByIdAndDelete(id);
+        await User.findByIdAndDelete(req.user._id);
+        
+        res.clearCookie('accessToken');
 
         res.status(200).json({
             success: true,
             message: 'Account deleted successfully!'
-        })
+        });
     } catch (error) {
         errorResponse(res, error, 500);
     }
