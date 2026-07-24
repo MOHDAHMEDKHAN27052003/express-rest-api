@@ -8,7 +8,13 @@ const getUser = async (req, res) => {
             data: req.user
         });
     } catch (error) {
-        errorResponse(res, error, 500);
+        res.status(404).json({
+            success: false,
+            message: 'User not found!',
+            error: error.message
+        })
+
+        errorResponse(res, error);
     }
 }
 
@@ -47,14 +53,15 @@ const updateUser = async (req, res) => {
                 message: "This email already exists!"
             });
         }
-        errorResponse(res, error, 500);
+
+        errorResponse(res, error);
     }
 }
 
 const deleteUser = async (req, res) => {
     try {
         await User.findByIdAndDelete(req.user._id);
-        
+
         res.clearCookie('accessToken');
 
         res.status(200).json({
@@ -62,7 +69,7 @@ const deleteUser = async (req, res) => {
             message: 'Account deleted successfully!'
         });
     } catch (error) {
-        errorResponse(res, error, 500);
+        errorResponse(res, error);
     }
 }
 

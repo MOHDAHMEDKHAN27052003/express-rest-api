@@ -1,5 +1,5 @@
-const errorResponse = (res, error, code) => {
-    return res.status(code).json({
+const errorResponse = (res, error) => {
+    return res.status(500).json({
         success: false,
         message: "Internal server error",
         error: error.message
