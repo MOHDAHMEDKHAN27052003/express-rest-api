@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const errorResponse = require("../utils/serverErrorResponse");
+const { generateTokens } = require("../utils/token");
 
 const signup = async (req, res) => {
     try {
@@ -20,7 +21,25 @@ const signup = async (req, res) => {
             password
         });
 
+        const { accessToken, refreshToken } = generateTokens(user._id);
+
+        user.refreshToken = refreshToken;
+        user.isAuthenticated = true;
         await user.save();
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
 
         res.status(201).json({
             success: true,
