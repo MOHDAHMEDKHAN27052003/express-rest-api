@@ -16,11 +16,7 @@ userSchema.pre('save', async function () {
 
     if (this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, salt);
-    }
-
-    if (this.isModified('refreshToken')) {
-        this.refreshToken = await bcrypt.hash(this.refreshToken, salt);
-    }
+    };
 });
 
 userSchema.methods.comparePassword = async function (plainPassword) {

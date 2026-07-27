@@ -51,4 +51,39 @@ const signup = async (req, res) => {
     }
 };
 
-module.exports = { signup };
+const signout = async (req, res) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if (refreshToken) {
+            await User.findOneAndUpdate(
+                { refreshToken },
+                { 
+                    $unset: { refreshToken: "" },
+                    isAuthenticated: false 
+                }
+            );
+        }
+
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Successfully signed out!'
+        });
+    } catch (error) {
+        errorResponse(res, error);
+    }
+};
+
+module.exports = { signup, signout };
