@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const errorResponse = require("../utils/serverErrorResponse");
-const { generateTokens } = require("../utils/token");
+const { generateTokens, verifyToken } = require("../utils/token");
 
 const signup = async (req, res) => {
     try {
@@ -154,4 +154,71 @@ const signout = async (req, res) => {
     }
 };
 
-module.exports = { signup, signin, signout };
+const updateTokens = async (req, res) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if (!refreshToken) {
+            return res.status(401).json({
+                success: false,
+                message: 'No refresh token provided!'
+            });
+        }
+
+        const decoded = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        
+        if (!decoded) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid or expired refresh token!'
+            });
+        }
+
+        const user = await User.findOne({ 
+            _id: decoded.userId,
+            'refreshTokens.token': refreshToken 
+        });
+
+        if (!user) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid refresh token!'
+            });
+        }
+
+        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = generateTokens(user._id);
+
+        user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
+        
+        user.refreshTokens.push({
+            token: newRefreshToken,
+            deviceInfo: req.headers['user-agent'] || 'Unknown device',
+            createdAt: new Date()
+        });
+
+        await user.save();
+
+        res.cookie('accessToken', newAccessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({
+            success: true,
+            message: 'Tokens updated successfully!'
+        });
+    } catch (error) {
+        errorResponse(res, error);
+    }
+};
+
+module.exports = { signup, signin, signout, updateTokens };

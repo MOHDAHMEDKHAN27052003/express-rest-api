@@ -23,8 +23,13 @@ const generateTokens = (userId) => {
     return { accessToken, refreshToken };
 };
 
+const verifyToken = (token, secret) => {
+    return jwt.verify(token, secret);
+};
+
 module.exports = {
     generateAccessToken,
     generateRefreshToken,
-    generateTokens
+    generateTokens,
+    verifyToken
 };
