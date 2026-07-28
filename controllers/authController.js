@@ -1,6 +1,6 @@
 const User = require("../models/User");
-const errorResponse = require("../utils/serverErrorResponse");
-const { generateTokens, verifyToken } = require("../utils/token");
+const errorResponse = require("../utils/serverError");
+const { generateTokens, verifyToken } = require("../utils/tokens");
 
 const signup = async (req, res) => {
     try {
