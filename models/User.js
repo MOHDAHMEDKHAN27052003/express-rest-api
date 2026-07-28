@@ -5,7 +5,11 @@ const userSchema = new mongoose.Schema({
     name: { type: String },
     email: { type: String },
     password: { type: String },
-    refreshToken: { type: String },
+    refreshTokens: [{
+        token: String,
+        deviceInfo: String,
+        createdAt: Date
+    }],
     isAuthenticated: { type: Boolean, default: false }
 },
     { timestamps: true }
@@ -23,15 +27,11 @@ userSchema.methods.comparePassword = async function (plainPassword) {
     return await bcrypt.compare(plainPassword, this.password);
 };
 
-userSchema.methods.compareRefreshToken = async function (plainRefreshToken) {
-    return await bcrypt.compare(plainRefreshToken, this.refreshToken);
-};
-
 userSchema.set('toJSON', {
     transform: function (doc, ret) {
         delete ret.password;
         delete ret.__v;
-        delete ret.refreshToken;
+        delete ret.refreshTokens;
 
         return ret;
     }

@@ -23,8 +23,14 @@ const signup = async (req, res) => {
 
         const { accessToken, refreshToken } = generateTokens(user._id);
 
-        user.refreshToken = refreshToken;
+        user.refreshTokens.push({
+            token: refreshToken,
+            deviceInfo: req.headers['user-agent'] || 'Unknown device',
+            createdAt: new Date()
+        });
+
         user.isAuthenticated = true;
+
         await user.save();
 
         res.cookie('accessToken', accessToken, {
@@ -51,18 +57,80 @@ const signup = async (req, res) => {
     }
 };
 
+const signin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password!'
+            });
+        }
+
+        const isPasswordValid = await user.comparePassword(password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password!'
+            });
+        }
+
+        const { accessToken, refreshToken } = generateTokens(user._id);
+
+        user.refreshTokens.push({
+            token: refreshToken,
+            deviceInfo: req.headers['user-agent'] || 'Unknown device',
+            createdAt: new Date()
+        });
+
+        user.isAuthenticated = true;
+
+        await user.save();
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 15 * 60 * 1000
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+        res.status(200).json({
+            success: true,
+            message: `Welcome back, ${user.name}!`,
+            data: user
+        });
+    } catch (error) {
+        errorResponse(res, error);
+    }
+};
+
 const signout = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;
 
         if (refreshToken) {
-            await User.findOneAndUpdate(
-                { refreshToken },
-                { 
-                    $unset: { refreshToken: "" },
-                    isAuthenticated: false 
+            const user = await User.findOne({ 'refreshTokens.token': refreshToken });
+            
+            if (user) {
+                user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
+                
+                if (user.refreshTokens.length === 0) {
+                    user.isAuthenticated = false;
                 }
-            );
+
+                await user.save();
+            }
         }
 
         res.clearCookie('accessToken', {
@@ -86,4 +154,4 @@ const signout = async (req, res) => {
     }
 };
 
-module.exports = { signup, signout };
+module.exports = { signup, signin, signout };
