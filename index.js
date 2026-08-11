@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./configs/db");
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const cookieParser = require("cookie-parser");
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
