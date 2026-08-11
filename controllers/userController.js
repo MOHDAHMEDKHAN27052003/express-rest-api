@@ -52,7 +52,46 @@ const updateProfile = async (req, res) => {
     }
 };
 
+const deleteProfile = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { password } = req.body;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        const isPasswordValid = await user.comparePassword(password);
+        
+        if (!isPasswordValid) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid password'
+            });
+        }
+
+        await User.findByIdAndDelete(userId);
+
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken');
+
+        return res.status(200).json({
+            success: true,
+            message: 'Your account is deleted successfully'
+        });
+
+    } catch (error) {
+        errorResponse(res, error);
+    }
+};
+
 module.exports = {
     getProfile,
-    updateProfile
+    updateProfile,
+    deleteProfile
 };
