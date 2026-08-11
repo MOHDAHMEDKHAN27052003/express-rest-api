@@ -11,7 +11,7 @@ const signup = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message: 'This email already exists!'
+                message: 'This email already exists'
             });
         }
 
@@ -66,7 +66,7 @@ const signin = async (req, res) => {
         if (!user) {
             return res.status(401).json({
                 success: false,
-                message: 'Invalid email or password!'
+                message: 'Invalid email or password'
             });
         }
 
@@ -75,7 +75,7 @@ const signin = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
-                message: 'Invalid email or password!'
+                message: 'Invalid email or password'
             });
         }
 
@@ -107,7 +107,7 @@ const signin = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: `Welcome back, ${user.name}!`,
+            message: `Welcome back, ${user.name}`,
             data: user
         });
     } catch (error) {
@@ -147,7 +147,7 @@ const signout = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Successfully signed out!'
+            message: "You're signed out successfully"
         });
     } catch (error) {
         errorResponse(res, error);
@@ -161,7 +161,7 @@ const updateTokens = async (req, res) => {
         if (!refreshToken) {
             return res.status(401).json({
                 success: false,
-                message: 'No refresh token provided!'
+                message: 'No refresh token provided'
             });
         }
 
@@ -170,7 +170,7 @@ const updateTokens = async (req, res) => {
         if (!decoded) {
             return res.status(403).json({
                 success: false,
-                message: 'Invalid or expired refresh token!'
+                message: 'Invalid or expired refresh token'
             });
         }
 
@@ -182,7 +182,7 @@ const updateTokens = async (req, res) => {
         if (!user) {
             return res.status(403).json({
                 success: false,
-                message: 'Invalid refresh token!'
+                message: 'Invalid refresh token'
             });
         }
 
@@ -214,7 +214,7 @@ const updateTokens = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Tokens updated successfully!'
+            message: 'Tokens updated successfully'
         });
     } catch (error) {
         errorResponse(res, error);

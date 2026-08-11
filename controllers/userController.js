@@ -24,6 +24,35 @@ const getProfile = async (req, res) => {
     }
 };
 
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { name } = req.body;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        user.name = name;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Your Name is updated successfully",
+            data: user
+        });
+
+    } catch (error) {
+        errorResponse(res, error);
+    }
+};
+
 module.exports = {
-    getProfile
+    getProfile,
+    updateProfile
 };
