@@ -121,10 +121,10 @@ const signout = async (req, res) => {
 
         if (refreshToken) {
             const user = await User.findOne({ 'refreshTokens.token': refreshToken });
-            
+
             if (user) {
                 user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
-                
+
                 if (user.refreshTokens.length === 0) {
                     user.isAuthenticated = false;
                 }
@@ -166,7 +166,7 @@ const updateTokens = async (req, res) => {
         }
 
         const decoded = verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        
+
         if (!decoded) {
             return res.status(403).json({
                 success: false,
@@ -174,9 +174,9 @@ const updateTokens = async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ 
+        const user = await User.findOne({
             _id: decoded.userId,
-            'refreshTokens.token': refreshToken 
+            'refreshTokens.token': refreshToken
         });
 
         if (!user) {
@@ -189,7 +189,7 @@ const updateTokens = async (req, res) => {
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = generateTokens(user._id);
 
         user.refreshTokens = user.refreshTokens.filter(t => t.token !== refreshToken);
-        
+
         user.refreshTokens.push({
             token: newRefreshToken,
             deviceInfo: req.headers['user-agent'] || 'Unknown device',

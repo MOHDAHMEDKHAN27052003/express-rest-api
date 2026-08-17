@@ -67,7 +67,7 @@ const deleteProfile = async (req, res) => {
         }
 
         const isPasswordValid = await user.comparePassword(password);
-        
+
         if (!isPasswordValid) {
             return res.status(401).json({
                 success: false,
