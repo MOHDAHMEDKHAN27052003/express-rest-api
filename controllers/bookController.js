@@ -3,13 +3,13 @@ const errorResponse = require('../utils/serverError');
 
 const createBook = async (req, res) => {
     try {
-        const { 
-            title, 
-            author, 
-            ISBN, 
+        const {
+            title,
+            author,
+            ISBN,
             publicationYear,
-            genre, 
-            quantity 
+            genre,
+            quantity
         } = req.body;
 
         const existingBook = await Book.findOne({ ISBN });
@@ -45,12 +45,39 @@ const createBook = async (req, res) => {
 
 const getAllBooks = async (req, res) => {
     try {
-        const books = await Book.find();
-        
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 4;
+
+        const { genre, author, publicationYear } = req.query;
+        const filter = {};
+
+        if (genre) filter.genre = genre;
+        if (author) filter.author = author;
+        if (publicationYear) filter.publicationYear = publicationYear;
+
+        const options = {
+            page: page,
+            limit: limit,
+            sort: { createdAt: -1 }
+        };
+
+        const result = await Book.paginate(filter, options);
+
         res.status(200).json({
             success: true,
-            data: books
+            data: result.docs,
+            pagination: {
+                currentPage: result.page,
+                totalPages: result.totalPages,
+                totalItems: result.totalDocs,
+                itemsPerPage: result.limit,
+                hasNextPage: result.hasNextPage,
+                hasPrevPage: result.hasPrevPage,
+                nextPage: result.nextPage,
+                prevPage: result.prevPage
+            }
         });
+
     } catch (error) {
         errorResponse(res, error);
     }
