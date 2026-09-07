@@ -5,6 +5,13 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const cookieParser = require("cookie-parser");
 const bookRoutes = require('./routes/bookRoutes');
+const cors = require('cors');
+
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  credentials: true,
+};
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -13,6 +20,7 @@ connectDB();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(corsOptions));
 
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
