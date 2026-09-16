@@ -83,7 +83,38 @@ const getAllBooks = async (req, res) => {
     }
 };
 
+const getBookById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const book = await Book.findById(id);
+
+        if (!book) {
+            return res.status(404).json({
+                success: false,
+                message: 'Book not found'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: book
+        });
+    } catch (error) {
+        // Handle invalid ObjectId format
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid book ID format'
+            });
+        }
+
+        errorResponse(res, error);
+    }
+};
+
 module.exports = {
     createBook,
-    getAllBooks
+    getAllBooks,
+    getBookById
 };
