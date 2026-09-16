@@ -8,9 +8,9 @@ const bookRoutes = require('./routes/bookRoutes');
 const cors = require('cors');
 
 const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  credentials: true,
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    credentials: true,
 };
 
 const app = express();
