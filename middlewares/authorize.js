@@ -15,7 +15,7 @@ const authorize = async (req, res, next) => {
         if (user.role !== 'librarian') {
             return res.status(403).json({
                 success: false,
-                message: 'Access denied. Only librarians can create books.'
+                message: 'Access denied. Only librarians can manage the books.'
             });
         }
 

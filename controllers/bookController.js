@@ -113,8 +113,40 @@ const getBookById = async (req, res) => {
     }
 };
 
+const deleteBookById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deletedBook = await Book.findByIdAndDelete(id);
+
+        // Check if book exists
+        if (!deletedBook) {
+            return res.status(404).json({
+                success: false,
+                message: 'Book not found'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Book deleted successfully'
+        });
+
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid book ID format'
+            });
+        }
+        
+        errorResponse(res, error);
+    }
+};
+
 module.exports = {
     createBook,
     getAllBooks,
-    getBookById
+    getBookById,
+    deleteBookById
 };
