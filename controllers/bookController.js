@@ -144,9 +144,62 @@ const deleteBookById = async (req, res) => {
     }
 };
 
+const updateBookById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const allowedFields = [
+            'title',
+            'author',
+            'publicationYear',
+            'genre',
+            'quantity'
+        ];
+
+        const updates = {};
+        allowedFields.forEach((field) => {
+            if (req.body[field] !== undefined) {
+                updates[field] = req.body[field];
+            }
+        });
+
+        if (Object.keys(updates).length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: `No valid fields provided. Allowed fields: ${allowedFields.join(', ')}`
+            });
+        }
+
+        const updatedBook = await Book.findByIdAndUpdate(
+            id,
+            { $set: updates },
+            {
+                returnDocument: 'after',
+                runValidators: true,
+            }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: 'Book updated successfully',
+            data: updatedBook
+        });
+    } catch (error) {
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid book ID format'
+            });
+        }
+
+        errorResponse(res, error)
+    }
+};
+
 module.exports = {
     createBook,
     getAllBooks,
     getBookById,
-    deleteBookById
+    deleteBookById,
+    updateBookById
 };
